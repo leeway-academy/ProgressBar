@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <h1>Progress bar test</h1>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress"></div>
+        </div>
+        <button id="start">Start</button>
+        <div id="done" style="visibility: hidden">
+            <h2>All done!</h2>
+        </div>
+    </body>
+    <script type="text/javascript">
+        document.getElementById('start').addEventListener("click", function () {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById('progress').setAttribute('aria-valuenow', '0');
+                    document.getElementById('progress').setAttribute('style', 'width: 0%');
+                }
+            };
+            xhttp.open("GET", "restart.php", true);
+            xhttp.send();
+
+            let i = setInterval( function () {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        let newValue = parseInt(this.responseText);
+                        let htmlElement = document.getElementById('progress');
+
+                        htmlElement.setAttribute('aria-valuenow', newValue);
+                        htmlElement.setAttribute('style', 'width: ' + newValue + '%');
+                        htmlElement.innerText = newValue + '%';
+
+                        if (newValue >= 100) {
+                            document.getElementById('done').setAttribute('style', 'visibility: block')
+                            clearInterval(i);
+                        }
+                    }
+                };
+                xhttp.open("GET", "get_status.php", true);
+                xhttp.send();
+            }, 1500 )
+        });
+    </script>
+</html>
